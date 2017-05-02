@@ -10,7 +10,7 @@ import java.util.*;
  * @since MoeDB 1.0.0
  */
 @SuppressWarnings("SameParameterValue")
-public final class RedisDatabase implements KeyValueDatabase {
+public class RedisDatabase implements KeyValueDatabase {
 	private Jedis client = null;
 
 	public RedisDatabase(String host, int port, String user, String password) throws JedisConnectionException {
