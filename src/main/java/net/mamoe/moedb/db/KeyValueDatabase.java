@@ -1,8 +1,6 @@
 package net.mamoe.moedb.db;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 键值式数据库
@@ -21,6 +19,14 @@ public interface KeyValueDatabase extends Database {
 		LEFT,
 		RIGHT
 	}
+
+	/**
+	 * 获取所有的 key(包括字符串, 哈希表, 集合)
+	 *
+	 * @return 所有的 key
+	 */
+	Collection<String> getKeys();
+
 
 	/* String */
 

@@ -27,6 +27,15 @@ public class ConfigDatabase implements KeyValueDatabase {
 	}
 
 	@Override
+	public Collection<String> getKeys() {
+		LinkedList<String> keys = new LinkedList<>();
+		keys.addAll(strings.keySet());
+		keys.addAll(maps.keySet());
+		keys.addAll(lists.keySet());
+		return keys;
+	}
+
+	@Override
 	public Object get(String key) {
 		return strings.get(key);
 	}

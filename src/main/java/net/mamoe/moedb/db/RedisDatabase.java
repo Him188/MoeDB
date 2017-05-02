@@ -73,6 +73,11 @@ public class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
+	public Collection<String> getKeys() {
+		return client.keys("(.*)");//matches all
+	}
+
 	/* *********************************************** */
 	/* ******************** 字符串 ******************** */
 	/* *********************************************** */
