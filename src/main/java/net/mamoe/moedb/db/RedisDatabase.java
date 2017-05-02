@@ -3,10 +3,7 @@ package net.mamoe.moedb.db;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Him188 @ MoeDB Project
@@ -120,20 +117,21 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized List<String> multiGet(String... keys) {
-		return multiGet(new ArrayList<>(), keys);
+	public synchronized LinkedList<Object> multiGet(String... keys) {
+		return multiGet(new LinkedList<>(), keys);
 	}
 
 	@Override
-	public synchronized List<String> multiGet(List<String> defaultValue, String... keys) {
+	public synchronized LinkedList<Object> multiGet(LinkedList<Object> defaultValue, String... keys) {
 		try {
-			return client.mget(keys);
+			return new LinkedList<Object>() {{
+				addAll(client.mget(keys));
+			}};
 		} catch (Exception e) {
 			return defaultValue;
 		}
 	}
 
-	@Override
 	public synchronized boolean multiSet(String... keys_values) {
 		try {
 			client.mset(keys_values);
@@ -337,12 +335,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 * @return value
 	 */
 	@Override
-	public synchronized String hashGet(String key, String field) {
+	public synchronized Object hashGet(String key, String field) {
 		return hashGet(key, field, "");
 	}
 
 	@Override
-	public synchronized String hashGet(String key, String field, String defaultValue) {
+	public synchronized Object hashGet(String key, String field, Object defaultValue) {
 		String value;
 		try {
 			value = client.hget(key, field);
@@ -361,14 +359,14 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 * @return all keys and values
 	 */
 	@Override
-	public synchronized Map<String, String> hashGetAll(String key) {
+	public synchronized Map<String, Object> hashGetAll(String key) {
 		return hashGetAll(key, new HashMap<>());
 	}
 
 	@Override
-	public synchronized Map<String, String> hashGetAll(String key, Map<String, String> defaultValue) {
+	public synchronized Map<String, Object> hashGetAll(String key, Map<String, Object> defaultValue) {
 		try {
-			return client.hgetAll(key);
+			return new LinkedHashMap<>(client.hgetAll(key));
 		} catch (Exception e) {
 			return defaultValue;
 		}
@@ -404,15 +402,15 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 * @return values
 	 */
 	@Override
-	public synchronized List<String> hashMultiGet(String key, String... fields) {
+	public synchronized List<Object> hashMultiGet(String key, String... fields) {
 		return hashMultiGet(key, new ArrayList<>(), fields);
 
 	}
 
 	@Override
-	public synchronized List<String> hashMultiGet(String key, List<String> defaultValue, String... fields) {
+	public synchronized List<Object> hashMultiGet(String key, List<Object> defaultValue, String... fields) {
 		try {
-			return client.hmget(key, fields);
+			return new LinkedList<>(client.hmget(key, fields));
 		} catch (Exception e) {
 			return defaultValue;
 		}
@@ -426,16 +424,20 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 * @param value value
 	 */
 	@Override
-	public synchronized boolean hashSet(String key, Map<String, String> value) {
+	public synchronized boolean hashSet(String key, Map<String, Object> value) {
 		//client.hmset(key, value); // causes a fucking exception
 
 		try {
 			Map<String, String> original = client.hgetAll(key);
-			original.putAll(value);
+			original.putAll(new LinkedHashMap<String, String>() {
+				{
+					value.forEach((key, value) -> put(key, value.toString()));
+				}
+			});
 			for (String s : array_change(original.keySet().toArray())) {
 				client.hdel(key, s);
 			}
-			value.forEach((k, v) -> client.hset(key, k, v));
+			value.forEach((k, v) -> client.hset(key, k, v.toString()));
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -452,7 +454,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized boolean hashSet(String key, String field, String value) {
+	public synchronized boolean hashSet(String key, String field, Object value) {
 		if (value == null) {
 			value = "";
 		}
@@ -462,7 +464,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 
 		//System.out.println(key + "||" + field + "||" + value);
 		try {
-			client.hset(key, field, value);
+			client.hset(key, field, value.toString());
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -470,9 +472,9 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized boolean hashSetIfNx(String key, String field, String value) {
+	public synchronized boolean hashSetIfNx(String key, String field, Object value) {
 		try {
-			client.hsetnx(key, field, value);
+			client.hsetnx(key, field, value.toString());
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -480,14 +482,14 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized List<String> hashGetValues(String key) {
+	public synchronized List<Object> hashGetValues(String key) {
 		return hashGetValues(key, new ArrayList<>());
 	}
 
 	@Override
-	public synchronized List<String> hashGetValues(String key, List<String> defaultValue) {
+	public synchronized List<Object> hashGetValues(String key, List<Object> defaultValue) {
 		try {
-			return client.hvals(key);
+			return new LinkedList<>(client.hvals(key));
 		} catch (Exception e) {
 			return defaultValue;
 		}
@@ -495,7 +497,14 @@ public final class RedisDatabase implements KeyValueDatabase {
 
 	/* List */
 
-	@Override
+	/**
+	 * 批量删除并获取列表的第一个值. 如果该列表不存在值, 将会阻塞线程直到有可获取的值为止.
+	 *
+	 * @param timeout seconds
+	 * @param keys    keys
+	 *
+	 * @return values
+	 */
 	public synchronized List<String> listLeftPop(int timeout, String... keys) {
 		try {
 			return client.blpop(timeout, keys);
@@ -504,7 +513,14 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
-	@Override
+	/**
+	 * 批量删除并获取列表的最后一个值. 如果该列表不存在值, 将会阻塞线程直到有可获取的值为止.
+	 *
+	 * @param timeout seconds
+	 * @param keys    keys
+	 *
+	 * @return values
+	 */
 	public synchronized List<String> listRightPop(int timeout, String... keys) {
 		try {
 			return client.brpop(timeout, keys);
@@ -514,14 +530,14 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized String listGet(String key, long index) {
+	public synchronized Object listGet(String key, long index) {
 		return listGet(key, index, "");
 	}
 
 	@Override
-	public synchronized String listGet(String key, long index, String defaultValue) {
+	public synchronized Object listGet(String key, long index, Object defaultValue) {
 		try {
-			String result = client.lindex(key, index);
+			Object result = client.lindex(key, index);
 			return result == null ? defaultValue : result;
 		} catch (Exception e) {
 			return defaultValue;
@@ -529,11 +545,10 @@ public final class RedisDatabase implements KeyValueDatabase {
 
 	}
 
-
 	@Override
-	public synchronized boolean listInsert(String key, boolean position, String existing_value, String value) {
+	public synchronized boolean listInsert(String key, InsertPosition position, Object existing_value, Object value) {
 		try {
-			client.linsert(key, position ? BinaryClient.LIST_POSITION.AFTER : BinaryClient.LIST_POSITION.BEFORE, existing_value, value);
+			client.linsert(key, InsertPosition.LEFT == position ? BinaryClient.LIST_POSITION.AFTER : BinaryClient.LIST_POSITION.BEFORE, existing_value.toString(), value.toString());
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -555,12 +570,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized String listLeftPop(String key) {
+	public synchronized Object listLeftPop(String key) {
 		return listLeftPop(key, null);
 	}
 
 	@Override
-	public synchronized String listLeftPop(String key, String defaultValue) {
+	public synchronized Object listLeftPop(String key, Object defaultValue) {
 		String result;
 		try {
 			result = client.lpop(key);
@@ -571,12 +586,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized String listRightPop(String key) {
+	public synchronized Object listRightPop(String key) {
 		return listRightPop(key, null);
 	}
 
 	@Override
-	public synchronized String listRightPop(String key, String defaultValue) {
+	public synchronized Object listRightPop(String key, Object defaultValue) {
 		String result;
 		try {
 			result = client.rpop(key);
@@ -587,21 +602,29 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized boolean listLeftPush(String key, String... value) {
+	public synchronized boolean listLeftPush(String key, Object... value) {
 		try {
-			client.lpush(key, value);
-
+			client.lpush(key, cast(value));
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
 
+	private static String[] cast(Object[] value) {
+		String[] result = new String[value.length];
+		for (int i = 0; i < value.length; i++) {
+			result[i] = value[i].toString();
+		}
+
+		return result;
+	}
+
 	@Override
-	public synchronized boolean listLeftPushIfNx(String key, String... value) {
+	public synchronized boolean listLeftPushIfNx(String key, Object... value) {
 		try {
-			for (String s : value) {
-				client.lpushx(key, s);
+			for (Object s : value) {
+				client.lpushx(key, s.toString());
 			}
 			return true;
 		} catch (Exception e) {
@@ -610,9 +633,9 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized boolean listRightPush(String key, String... value) {
+	public synchronized boolean listRightPush(String key, Object... value) {
 		try {
-			client.rpush(key, value);
+			client.rpush(key, cast(value));
 
 			return true;
 		} catch (Exception e) {
@@ -621,10 +644,10 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized boolean listRightPushIfNx(String key, String... value) {
+	public synchronized boolean listRightPushIfNx(String key, Object... value) {
 		try {
-			for (String s : value) {
-				client.rpushx(key, s);
+			for (Object s : value) {
+				client.rpushx(key, s.toString());
 			}
 			return true;
 		} catch (Exception e) {
@@ -633,9 +656,9 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@Override
-	public synchronized List<String> listRange(String key, long start, long end) {
+	public synchronized List<Object> listRange(String key, long start, long end) {
 		try {
-			return client.lrange(key, start, end);
+			return new LinkedList<>(client.lrange(key, start, end));
 		} catch (Exception e) {
 			return new ArrayList<>();
 		}
@@ -643,47 +666,47 @@ public final class RedisDatabase implements KeyValueDatabase {
 
 	@SuppressWarnings("SameParameterValue")
 	@Override
-	public synchronized List<String> listRange(String key, long start) {
+	public synchronized List<Object> listRange(String key, long start) {
 		try {
-			return client.lrange(key, start, -1);
+			return new LinkedList<>(client.lrange(key, start, -1));
 		} catch (Exception e) {
 			return new ArrayList<>();
 		}
 	}
 
 	@Override
-	public synchronized List<String> listGetAll(String key) {
+	public synchronized List<Object> listGetAll(String key) {
 		return listRange(key, 0);
 	}
 
 	@Override
-	public synchronized long listRemove(String key, long count, String value) {
+	public synchronized long listRemove(String key, long count, Object value) {
 		try {
-			return client.lrem(key, count, value);
+			return client.lrem(key, count, value.toString());
 		} catch (Exception e) {
 			return 0L;
 		}
 	}
 
 	@Override
-	public synchronized long listDelete(String key, long count, String value) {
+	public synchronized long listDelete(String key, long count, Object value) {
 		return listRemove(key, count, value);
 	}
 
 	@Override
-	public synchronized long listRemove(String key, String value) {
+	public synchronized long listRemove(String key, Object value) {
 		return listRemove(key, 0, value);
 	}
 
 	@Override
-	public synchronized long listDelete(String key, String value) {
+	public synchronized long listDelete(String key, Object value) {
 		return listRemove(key, 0, value);
 	}
 
 	@Override
-	public synchronized boolean listSet(String key, long index, String value) {
+	public synchronized boolean listSet(String key, long index, Object value) {
 		try {
-			client.lset(key, index, value);
+			client.lset(key, index, value.toString());
 			return true;
 		} catch (Exception e) {
 			return false;

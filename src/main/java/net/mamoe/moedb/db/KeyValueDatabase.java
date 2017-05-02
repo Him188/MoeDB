@@ -1,5 +1,6 @@
 package net.mamoe.moedb.db;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,17 @@ import java.util.Map;
  * @since MoeDB 1.0.0
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
-interface KeyValueDatabase extends Database {
+public interface KeyValueDatabase extends Database {
+	/**
+	 * @author Him188 @ MoeDB Project
+	 * @see #listInsert(String, InsertPosition, Object, Object)
+	 * @since MoeDB 1.0.0
+	 */
+	enum InsertPosition {
+		LEFT,
+		RIGHT
+	}
+
 	/* String */
 
 	/**
@@ -53,28 +64,20 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return value list
 	 */
-	List<String> multiGet(String... keys);
+	LinkedList<Object> multiGet(String... keys);
 
-	List<String> multiGet(List<String> defaultValue, String... keys);
-
-	/**
-	 * 批量设置 key 和 value
-	 * 用法: object.multiSet(key1, value1, key2, value2, key3, value3);
-	 *
-	 * @param keys_values key1 value1 key2 value2 key3 value3
-	 */
-	boolean multiSet(String... keys_values);
+	LinkedList<Object> multiGet(LinkedList<Object> defaultValue, String... keys);
 
 	/* HashTable */
 
 	/**
-	 * 删除 key 中的 fields
+	 * 删除 key 中的 field
 	 *
-	 * @param key    key
-	 * @param fields fields
+	 * @param key   key
+	 * @param field field
 	 */
 	@SuppressWarnings("SameParameterValue")
-	boolean hashDelete(String key, String fields);
+	boolean hashDelete(String key, String field);
 
 	/**
 	 * 检查 key 中是否存在 field
@@ -94,9 +97,9 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return value
 	 */
-	String hashGet(String key, String field);
+	Object hashGet(String key, String field);
 
-	String hashGet(String key, String field, String defaultValue);
+	Object hashGet(String key, String field, Object defaultValue);
 
 	/**
 	 * 获取 key 中所有键和值
@@ -105,9 +108,9 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return all keys and values
 	 */
-	Map<String, String> hashGetAll(String key);
+	Map<String, Object> hashGetAll(String key);
 
-	Map<String, String> hashGetAll(String key, Map<String, String> defaultValue);
+	Map<String, Object> hashGetAll(String key, Map<String, Object> defaultValue);
 
 	/**
 	 * 获取 key 中键数量
@@ -128,26 +131,26 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return values
 	 */
-	List<String> hashMultiGet(String key, String... fields);
+	List<Object> hashMultiGet(String key, String... fields);
 
-	List<String> hashMultiGet(String key, List<String> defaultValue, String... fields);
+	List<Object> hashMultiGet(String key, List<Object> defaultValue, String... fields);
 
 	/**
-	 * 设置 key 的值为 value
+	 * 设置 key 整体的值为 value
 	 *
 	 * @param key   key
 	 * @param value value
 	 */
-	boolean hashSet(String key, Map<String, String> value);
+	boolean hashSet(String key, Map<String, Object> value);
 
 	/**
-	 * 设置 key 的值为 value
+	 * 设置 key 中 field 的值为 value
 	 *
 	 * @param key   key
 	 * @param field field
 	 * @param value value
 	 */
-	boolean hashSet(String key, String field, String value);
+	boolean hashSet(String key, String field, Object value);
 
 	/**
 	 * 只有在 key 不存在时才设置 key 的值为 value
@@ -156,7 +159,7 @@ interface KeyValueDatabase extends Database {
 	 * @param field field
 	 * @param value value
 	 */
-	boolean hashSetIfNx(String key, String field, String value);
+	boolean hashSetIfNx(String key, String field, Object value);
 
 	/**
 	 * 获取 key 的所有值
@@ -165,31 +168,21 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return value list
 	 */
-	List<String> hashGetValues(String key);
+	List<Object> hashGetValues(String key);
 
-	List<String> hashGetValues(String key, List<String> defaultValue);
+	List<Object> hashGetValues(String key, List<Object> defaultValue);
 
 	/* List */
 
 	/**
-	 * 批量删除并获取列表的第一个值. 如果该列表不存在值, 将会阻塞线程直到有可获取的值为止.
+	 * 获取 key 中第 index 个值
 	 *
-	 * @param timeout seconds
-	 * @param keys    keys
+	 * @param key   key
+	 * @param index index
 	 *
-	 * @return values
+	 * @return value
 	 */
-	List<String> listLeftPop(int timeout, String... keys);
-
-	/**
-	 * 批量删除并获取列表的最后一个值. 如果该列表不存在值, 将会阻塞线程直到有可获取的值为止.
-	 *
-	 * @param timeout seconds
-	 * @param keys    keys
-	 *
-	 * @return values
-	 */
-	List<String> listRightPop(int timeout, String... keys);
+	Object listGet(String key, long index);
 
 	/**
 	 * 获取 key 中第 index 个值
@@ -199,17 +192,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return value
 	 */
-	String listGet(String key, long index);
-
-	/**
-	 * 获取 key 中第 index 个值
-	 *
-	 * @param key   key
-	 * @param index index
-	 *
-	 * @return value
-	 */
-	String listGet(String key, long index, String defaultValue);
+	Object listGet(String key, long index, Object defaultValue);
 
 	/**
 	 * 在 key 中 existing_value 的前/后方插入 value.
@@ -219,7 +202,7 @@ interface KeyValueDatabase extends Database {
 	 * @param existing_value existing_value
 	 * @param value          value
 	 */
-	boolean listInsert(String key, boolean position, String existing_value, String value);
+	boolean listInsert(String key, InsertPosition position, Object existing_value, Object value);
 
 	/**
 	 * 获取 key 的长度
@@ -237,11 +220,11 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @param key key
 	 *
-	 * @return the first value default null
+	 * @return the first value defaults null
 	 */
-	String listLeftPop(String key);
+	Object listLeftPop(String key);
 
-	String listLeftPop(String key, String defaultValue);
+	Object listLeftPop(String key, Object defaultValue);
 
 	/**
 	 * 删除并获取 key 的最后一个值
@@ -250,9 +233,9 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return the last value default null
 	 */
-	String listRightPop(String key);
+	Object listRightPop(String key);
 
-	String listRightPop(String key, String defaultValue);
+	Object listRightPop(String key, Object defaultValue);
 
 	/**
 	 * 将一个或多个值插入到 key 的头部. 若 key 不存在, 将创建一个 key
@@ -260,7 +243,7 @@ interface KeyValueDatabase extends Database {
 	 * @param key   key
 	 * @param value values
 	 */
-	boolean listLeftPush(String key, String... value);
+	boolean listLeftPush(String key, Object... value);
 
 	/**
 	 * 将一个值或多个值插入到 key 的头部. 若 key 不存在, 将不进行任何操作
@@ -268,7 +251,7 @@ interface KeyValueDatabase extends Database {
 	 * @param key   key
 	 * @param value values
 	 */
-	boolean listLeftPushIfNx(String key, String... value);
+	boolean listLeftPushIfNx(String key, Object... value);
 
 	/**
 	 * 将一个或多个值插入到 key 的尾部. 若 key 不存在, 将创建一个 key
@@ -276,7 +259,7 @@ interface KeyValueDatabase extends Database {
 	 * @param key   key
 	 * @param value values
 	 */
-	boolean listRightPush(String key, String... value);
+	boolean listRightPush(String key, Object... value);
 
 	/**
 	 * 将一个值或多个值插入到 key 的尾部. 若 key 不存在, 将不进行任何操作
@@ -284,7 +267,7 @@ interface KeyValueDatabase extends Database {
 	 * @param key   key
 	 * @param value values
 	 */
-	boolean listRightPushIfNx(String key, String... value);
+	boolean listRightPushIfNx(String key, Object... value);
 
 	/**
 	 * 批量获取 key 中从 start 到 end 的值.
@@ -295,7 +278,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return values
 	 */
-	List<String> listRange(String key, long start, long end);
+	List<Object> listRange(String key, long start, long end);
 
 	/**
 	 * 批量获取 key 中从 start 到表尾的值.
@@ -306,7 +289,7 @@ interface KeyValueDatabase extends Database {
 	 * @return values
 	 */
 	@SuppressWarnings("SameParameterValue")
-	List<String> listRange(String key, long start);
+	List<Object> listRange(String key, long start);
 
 	/**
 	 * 获取 key 中所有值
@@ -315,7 +298,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return values
 	 */
-	List<String> listGetAll(String key);
+	List<Object> listGetAll(String key);
 
 	/**
 	 * 删除 key 中的 value
@@ -330,11 +313,9 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return returns how many values it has deleted, if key is not exists, this method will return 0L.
 	 */
-	long listRemove(String key, long count, String value);
+	long listRemove(String key, long count, Object value);
 
 	/**
-	 * 同 #listRemove(String, long, String)
-	 * <p>
 	 * 删除 key 中的 value
 	 * count:
 	 * count > 0 : 从表头开始向表尾搜索，移除与 value 相等的值，数量为 count 。
@@ -347,13 +328,11 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return returns how many values it has deleted, if key is not exits, this method will return 0L.
 	 *
-	 * @see #listRemove(String, long, String)
+	 * @see #listRemove(String, long, Object)
 	 */
-	long listDelete(String key, long count, String value);
+	long listDelete(String key, long count, Object value);
 
 	/**
-	 * 同 #listDelete(String, long, String)
-	 * <p>
 	 * 删除 key 中的 value
 	 *
 	 * @param key   key
@@ -361,13 +340,11 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return returns how many values it has deleted, if key is not exits, this method will return 0L.
 	 *
-	 * @see #listRemove(String, long, String)
+	 * @see #listRemove(String, Object)
 	 */
-	long listRemove(String key, String value);
+	long listRemove(String key, Object value);
 
 	/**
-	 * 同 #listRemove(String, long, String)
-	 * <p>
 	 * 删除 key 中的 value
 	 *
 	 * @param key   key
@@ -375,9 +352,9 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return returns how many values it has deleted, if key is not exits, this method will return 0L.
 	 *
-	 * @see #listRemove(String, long, String)
+	 * @see #listRemove(String, long, Object)
 	 */
-	long listDelete(String key, String value);
+	long listDelete(String key, Object value);
 
 	/**
 	 * 通过索引设置 key 的值
@@ -386,7 +363,7 @@ interface KeyValueDatabase extends Database {
 	 * @param index starts by 0
 	 * @param value value
 	 */
-	boolean listSet(String key, long index, String value);
+	boolean listSet(String key, long index, Object value);
 
 	/**
 	 * 对表进行修剪. 即让列表只保留指定区间内的值. 不在指定区间内的值都将被删除
