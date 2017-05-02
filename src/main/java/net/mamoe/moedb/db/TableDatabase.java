@@ -7,5 +7,6 @@ package net.mamoe.moedb.db;
  * @since MoeDB 1.0.0
  */
 public interface TableDatabase extends Database {
+// TODO: 2017/5/2
 
 }
