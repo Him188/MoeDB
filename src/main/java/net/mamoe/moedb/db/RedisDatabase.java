@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * @author Him188 @ MoeDB Project
- * @since MoeDB
+ * @since MoeDB 1.0.0
  */
 @SuppressWarnings("SameParameterValue")
 public final class RedisDatabase implements KeyValueDatabase {
@@ -80,10 +80,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 	/* ******************** 字符串 ******************** */
 	/* *********************************************** */
 
+	@Override
 	public synchronized Object get(String key) {
 		return get(key, null);
 	}
 
+	@Override
 	public synchronized Object get(String key, Object defaultValue) {
 		try {
 			String got = client.get(key);
@@ -93,6 +95,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean set(String key, Object value) {
 		try {
 			client.set(key, value.toString());
@@ -102,10 +105,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized Object getSet(String key, Object value) {
 		return getSet(key, value, null);
 	}
 
+	@Override
 	public synchronized Object getSet(String key, Object value, Object defaultValue) {
 		try {
 			return client.getSet(key, value.toString());
@@ -114,10 +119,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized List<String> multiGet(String... keys) {
 		return multiGet(new ArrayList<>(), keys);
 	}
 
+	@Override
 	public synchronized List<String> multiGet(List<String> defaultValue, String... keys) {
 		try {
 			return client.mget(keys);
@@ -126,6 +133,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean multiSet(String... keys_values) {
 		try {
 			client.mset(keys_values);
@@ -188,11 +196,11 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 *
 	 * @return length default 0
 	 */
-	public synchronized Long getLength(String key) {
+	public synchronized long getLength(String key) {
 		return getLength(key, 0);
 	}
 
-	public synchronized Long getLength(String key, long defaultValue) {
+	public synchronized long getLength(String key, long defaultValue) {
 		try {
 			return client.strlen(key);
 		} catch (Exception e) {
@@ -291,6 +299,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 * @param key    key
 	 * @param fields fields
 	 */
+	@Override
 	@SuppressWarnings("SameParameterValue")
 	public synchronized boolean hashDelete(String key, String fields) {
 		try {
@@ -310,6 +319,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 *
 	 * @return if exits
 	 */
+	@Override
 	public synchronized boolean hashExits(String key, String field) {
 		try {
 			return client.hexists(key, field);
@@ -326,10 +336,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 *
 	 * @return value
 	 */
+	@Override
 	public synchronized String hashGet(String key, String field) {
 		return hashGet(key, field, "");
 	}
 
+	@Override
 	public synchronized String hashGet(String key, String field, String defaultValue) {
 		String value;
 		try {
@@ -348,10 +360,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 *
 	 * @return all keys and values
 	 */
+	@Override
 	public synchronized Map<String, String> hashGetAll(String key) {
 		return hashGetAll(key, new HashMap<>());
 	}
 
+	@Override
 	public synchronized Map<String, String> hashGetAll(String key, Map<String, String> defaultValue) {
 		try {
 			return client.hgetAll(key);
@@ -367,11 +381,13 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 *
 	 * @return length
 	 */
-	public synchronized Long hashGetLength(String key) {
+	@Override
+	public synchronized long hashGetLength(String key) {
 		return hashGetLength(key, 0);
 	}
 
-	public synchronized Long hashGetLength(String key, long defaultValue) {
+	@Override
+	public synchronized long hashGetLength(String key, long defaultValue) {
 		try {
 			return client.hlen(key);
 		} catch (Exception e) {
@@ -387,11 +403,13 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 *
 	 * @return values
 	 */
+	@Override
 	public synchronized List<String> hashMultiGet(String key, String... fields) {
 		return hashMultiGet(key, new ArrayList<>(), fields);
 
 	}
 
+	@Override
 	public synchronized List<String> hashMultiGet(String key, List<String> defaultValue, String... fields) {
 		try {
 			return client.hmget(key, fields);
@@ -407,6 +425,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 	 * @param key   key
 	 * @param value value
 	 */
+	@Override
 	public synchronized boolean hashSet(String key, Map<String, String> value) {
 		//client.hmset(key, value); // causes a fucking exception
 
@@ -432,6 +451,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		return result;
 	}
 
+	@Override
 	public synchronized boolean hashSet(String key, String field, String value) {
 		if (value == null) {
 			value = "";
@@ -449,6 +469,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean hashSetIfNx(String key, String field, String value) {
 		try {
 			client.hsetnx(key, field, value);
@@ -458,10 +479,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized List<String> hashGetValues(String key) {
 		return hashGetValues(key, new ArrayList<>());
 	}
 
+	@Override
 	public synchronized List<String> hashGetValues(String key, List<String> defaultValue) {
 		try {
 			return client.hvals(key);
@@ -472,6 +495,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 
 	/* List */
 
+	@Override
 	public synchronized List<String> listLeftPop(int timeout, String... keys) {
 		try {
 			return client.blpop(timeout, keys);
@@ -480,6 +504,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized List<String> listRightPop(int timeout, String... keys) {
 		try {
 			return client.brpop(timeout, keys);
@@ -488,10 +513,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized String listGet(String key, long index) {
 		return listGet(key, index, "");
 	}
 
+	@Override
 	public synchronized String listGet(String key, long index, String defaultValue) {
 		try {
 			String result = client.lindex(key, index);
@@ -503,6 +530,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 
+	@Override
 	public synchronized boolean listInsert(String key, boolean position, String existing_value, String value) {
 		try {
 			client.linsert(key, position ? BinaryClient.LIST_POSITION.AFTER : BinaryClient.LIST_POSITION.BEFORE, existing_value, value);
@@ -512,10 +540,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized long listLength(String key) {
 		return listLength(key, 0);
 	}
 
+	@Override
 	public synchronized long listLength(String key, long defaultValue) {
 		try {
 			return client.llen(key);
@@ -524,10 +554,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized String listLeftPop(String key) {
 		return listLeftPop(key, null);
 	}
 
+	@Override
 	public synchronized String listLeftPop(String key, String defaultValue) {
 		String result;
 		try {
@@ -538,10 +570,12 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized String listRightPop(String key) {
 		return listRightPop(key, null);
 	}
 
+	@Override
 	public synchronized String listRightPop(String key, String defaultValue) {
 		String result;
 		try {
@@ -552,6 +586,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean listLeftPush(String key, String... value) {
 		try {
 			client.lpush(key, value);
@@ -562,6 +597,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean listLeftPushIfNx(String key, String... value) {
 		try {
 			for (String s : value) {
@@ -573,6 +609,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean listRightPush(String key, String... value) {
 		try {
 			client.rpush(key, value);
@@ -583,6 +620,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean listRightPushIfNx(String key, String... value) {
 		try {
 			for (String s : value) {
@@ -594,6 +632,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized List<String> listRange(String key, long start, long end) {
 		try {
 			return client.lrange(key, start, end);
@@ -603,6 +642,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 	}
 
 	@SuppressWarnings("SameParameterValue")
+	@Override
 	public synchronized List<String> listRange(String key, long start) {
 		try {
 			return client.lrange(key, start, -1);
@@ -611,11 +651,13 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized List<String> listGetAll(String key) {
 		return listRange(key, 0);
 	}
 
-	public synchronized Long listRemove(String key, long count, String value) {
+	@Override
+	public synchronized long listRemove(String key, long count, String value) {
 		try {
 			return client.lrem(key, count, value);
 		} catch (Exception e) {
@@ -623,18 +665,22 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
-	public synchronized Long listDelete(String key, long count, String value) {
+	@Override
+	public synchronized long listDelete(String key, long count, String value) {
 		return listRemove(key, count, value);
 	}
 
-	public synchronized Long listRemove(String key, String value) {
+	@Override
+	public synchronized long listRemove(String key, String value) {
 		return listRemove(key, 0, value);
 	}
 
-	public synchronized Long listDelete(String key, String value) {
+	@Override
+	public synchronized long listDelete(String key, String value) {
 		return listRemove(key, 0, value);
 	}
 
+	@Override
 	public synchronized boolean listSet(String key, long index, String value) {
 		try {
 			client.lset(key, index, value);
@@ -644,6 +690,7 @@ public final class RedisDatabase implements KeyValueDatabase {
 		}
 	}
 
+	@Override
 	public synchronized boolean listTrim(String key, long start, long end) {
 		try {
 			client.ltrim(key, start, end);

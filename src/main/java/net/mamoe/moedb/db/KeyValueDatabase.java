@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 键值式数据库
+ *
  * @author Him188(code)      @ MoeDB Project
- * @author XianD233(javadoc) @ MoeDB Project
  * @since MoeDB 1.0.0
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
@@ -115,9 +116,9 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return length
 	 */
-	Long hashGetLength(String key);
+	long hashGetLength(String key);
 
-	Long hashGetLength(String key, long defaultValue);
+	long hashGetLength(String key, long defaultValue);
 
 	/**
 	 * 批量获取 key 中 fields 的值
@@ -329,7 +330,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @return returns how many values it has deleted, if key is not exists, this method will return 0L.
 	 */
-	Long listRemove(String key, long count, String value);
+	long listRemove(String key, long count, String value);
 
 	/**
 	 * 同 #listRemove(String, long, String)
@@ -348,7 +349,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @see #listRemove(String, long, String)
 	 */
-	Long listDelete(String key, long count, String value);
+	long listDelete(String key, long count, String value);
 
 	/**
 	 * 同 #listDelete(String, long, String)
@@ -362,7 +363,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @see #listRemove(String, long, String)
 	 */
-	Long listRemove(String key, String value);
+	long listRemove(String key, String value);
 
 	/**
 	 * 同 #listRemove(String, long, String)
@@ -376,7 +377,7 @@ interface KeyValueDatabase extends Database {
 	 *
 	 * @see #listRemove(String, long, String)
 	 */
-	Long listDelete(String key, String value);
+	long listDelete(String key, String value);
 
 	/**
 	 * 通过索引设置 key 的值

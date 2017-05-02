@@ -1,0 +1,8 @@
+name: MoeDB
+author: "Mamoe Tech"
+website: "https://github.com/MamoeTech/MoeDB"
+version: 1.0.0
+api: [1.0.0]
+load: STARTUP
+
+main: net.mamoe.moedb.MoeDB
