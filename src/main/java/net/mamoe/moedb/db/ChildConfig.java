@@ -7,15 +7,17 @@ import java.util.Map;
 
 /**
  * @author Him188 @ MoeDB Project
- * @since MoeDB
+ * @since MoeDB 1.0.0
  */
-class ChildConfig extends ConfigSection {
+public class ChildConfig extends ConfigSection {
 	private final String sectionName;
 	private final Config base;
+	private final boolean autoSave;
 
-	ChildConfig(String sectionName, Config base) {
+	ChildConfig(String sectionName, Config base, boolean autoSave) {
 		this.sectionName = sectionName;
 		this.base = base;
+		this.autoSave = autoSave;
 
 		this.putAll(base.getSection(sectionName));
 	}
@@ -29,7 +31,8 @@ class ChildConfig extends ConfigSection {
 		Object v = super.put(key, value);
 
 		base.set(sectionName, this);
-		base.save();
+
+		if (autoSave) base.save();
 		return v;
 	}
 
@@ -38,7 +41,7 @@ class ChildConfig extends ConfigSection {
 		Object v = super.putIfAbsent(key, value);
 
 		base.set(sectionName, this);
-		base.save();
+		if (autoSave) base.save();
 		return v;
 	}
 
@@ -47,6 +50,6 @@ class ChildConfig extends ConfigSection {
 		super.putAll(m);
 
 		base.set(sectionName, this);
-		base.save();
+		if (autoSave) base.save();
 	}
 }

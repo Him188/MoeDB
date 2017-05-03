@@ -7,18 +7,45 @@ import java.util.*;
 import static net.mamoe.moedb.Utils.*;
 
 /**
+ * Nukkit Config 数据库
+ *
  * @author Him188 @ MoeDB Project
  * @since MoeDB 1.0.0
  */
 public class ConfigDatabase implements KeyValueDatabase {
-	private final ChildConfig strings;
-	private final ChildConfig maps;
-	private final ChildConfig lists;
+	private final ChildConfig strings;  //数据库子项
+	private final ChildConfig maps;     //数据库子项
+	private final ChildConfig lists;    //数据库子项
 
+	private final Config config; //存储数据的文件
+
+	/**
+	 * 本地 Config 数据库构造器. 本构造器构造出的数据库实例会自动保存修改. 无需手动调用 {@link #save()}
+	 *
+	 * @param config Nukkit Config
+	 */
 	public ConfigDatabase(Config config) {
-		this.strings = new ChildConfig("strings", config);
-		this.maps = new ChildConfig("maps", config);
-		this.lists = new ChildConfig("lists", config);
+		this(config, true);
+	}
+
+	/**
+	 * 本地 Config 数据库构造器.
+	 *
+	 * @param config   Nukkit Config
+	 * @param autoSave 是否自动保存. 当 {@code autoSave} 为 {@code false} 时, 需要手动调用 {@link #save()}
+	 */
+	public ConfigDatabase(Config config, boolean autoSave) {
+		this.config = config;
+		this.strings = new ChildConfig("strings", config, autoSave);
+		this.maps = new ChildConfig("maps", config, autoSave);
+		this.lists = new ChildConfig("lists", config, autoSave);
+	}
+
+	/**
+	 * 当构造类实例时使用构造器 {@link #ConfigDatabase(Config, boolean)} 且 {@code autoSave} 为 {@code false} 时, 需要手动调用该方法保存修改
+	 */
+	public void save() {
+		this.config.save();
 	}
 
 	@Override
