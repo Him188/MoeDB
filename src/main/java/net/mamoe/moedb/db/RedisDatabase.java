@@ -6,6 +6,8 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import java.util.*;
 
 /**
+ * Redis 数据库. 本数据库无需手动保存, 所有保存工作交给 Redis 服务器来进行
+ *
  * @author Him188 @ MoeDB Project
  * @since MoeDB 1.0.0
  */

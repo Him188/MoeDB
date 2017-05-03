@@ -142,7 +142,7 @@ public interface KeyValueDatabase extends Database {
 	List<Object> hashMultiGet(String key, List<Object> defaultValue, String... fields);
 
 	/**
-	 * 设置 key 整体的值为 value
+	 * 设置 key 整体的值为 value(会先清除原有的值, 再进行设置)
 	 *
 	 * @param key   key
 	 * @param value value
