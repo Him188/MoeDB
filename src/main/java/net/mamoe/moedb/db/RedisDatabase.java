@@ -33,7 +33,7 @@ import java.util.*;
  * @author Him188 @ MoeDB Project
  * @since MoeDB 1.0.0
  */
-@SuppressWarnings("SameParameterValue")
+@SuppressWarnings({"SameParameterValue", "unused", "WeakerAccess"})
 public class RedisDatabase implements KeyValueDatabase {
 	private Jedis client = null;
 

@@ -45,6 +45,9 @@ public class ConfigDatabase implements KeyValueDatabase {
 	 * 当构造类实例时使用构造器 {@link #ConfigDatabase(Config, boolean)} 且 {@code autoSave} 为 {@code false} 时, 需要手动调用该方法保存修改
 	 */
 	public void save() {
+		this.config.set("strings", strings);
+		this.config.set("maps", maps);
+		this.config.set("lists", lists);
 		this.config.save();
 	}
 
