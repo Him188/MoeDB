@@ -10,7 +10,6 @@ import static net.mamoe.moedb.Utils.*;
  * Nukkit Config 数据库
  *
  * @author Him188 @ MoeDB Project
- * @since MoeDB 1.0.0
  */
 public class ConfigDatabase implements KeyValueDatabase {
 	private final ChildConfig strings;  //数据库子项

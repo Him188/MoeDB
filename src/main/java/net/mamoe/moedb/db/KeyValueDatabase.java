@@ -6,7 +6,6 @@ import java.util.*;
  * 键值式数据库
  *
  * @author Him188(code)      @ MoeDB Project
- * @since MoeDB 1.0.0
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
 public interface KeyValueDatabase extends Database {

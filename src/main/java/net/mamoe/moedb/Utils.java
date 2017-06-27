@@ -6,7 +6,6 @@ import java.util.Map;
 
 /**
  * @author Him188 @ MoeDB Project
- * @since MoeDB 1.0.0
  */
 public class Utils {
 	@SuppressWarnings("unchecked")

@@ -30,7 +30,6 @@ import java.util.*;
  * 本类 list 开头的方法使用的均是 Redis 的 list(链表), 而不是 set(集合). 集合暂未支持, 你可以通过 {@link #getClient()} 自行操作 set.
  * 可使用 {@link Integer#parseInt(String)} 等方法
  *
- * @author Him188 @ MoeDB Project
  * @since MoeDB 1.0.0
  */
 @SuppressWarnings({"SameParameterValue", "unused", "WeakerAccess"})
