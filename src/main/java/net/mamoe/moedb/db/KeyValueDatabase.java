@@ -1,11 +1,14 @@
 package net.mamoe.moedb.db;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 键值式数据库
  *
- * @author Him188(code)      @ MoeDB Project
+ * @author Him188(code) @ MoeDB Project
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
 public interface KeyValueDatabase extends Database {
