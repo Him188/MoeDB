@@ -1,7 +1,6 @@
 package net.mamoe.moedb.defaults;
 
 import net.mamoe.moedb.AbstractDatabase;
-import net.mamoe.moedb.Database;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -18,7 +17,7 @@ import java.util.Map.Entry;
  * @author Him188 @ MoeDB Project
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class RedisDatabase extends AbstractDatabase implements Database<String, Object> {
+public class RedisDatabase extends AbstractDatabase {
     public static String NAME = "Redis";
 
     private final Jedis client;
@@ -60,7 +59,7 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
 
     @Override
     public boolean containsKey(Object key) {
-        return !client.type(Objects.requireNonNull(key).toString()).equals("none");
+        return !client.type(Objects.requireNonNull(key, "key").toString()).equals("none");
     }
 
     /**
@@ -115,7 +114,7 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
     @Override
     public Object get(Object key) {
         if (key == null) {
-            return null;
+            throw new NullPointerException("key");
         }
 
         String stringKey = String.valueOf(key);
@@ -145,12 +144,16 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
      *
      * @return <code>key</code> 的旧值. 当 <code>key</code> 不存在时为 null
      *
-     * @throws ClassCastException       当参数 <code>value</code> 的类型无效时抛出(参数类型属于 Map, List 或 Set, 但值类型不是 String)
+     * @throws ClassCastException       当参数 <code>value</code> 的类型无效时抛出(参数类型属于 Map, List 或 Set, 但值类型或键类型不是 String)
      * @throws IllegalArgumentException 当参数 <code>value</code> 的类型无效时抛出(参数类型不属于 String, Map, List 或 Set)
      */
     @SuppressWarnings("unchecked")
     @Override
     public Object put(String key, Object value) throws ClassCastException, IllegalArgumentException {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+
         if (value instanceof String) {
             if (client.exists(key)) {
                 return client.getSet(key, String.valueOf(value));
@@ -184,12 +187,12 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
             return old;
         }
 
-        throw new IllegalArgumentException("argument value must be String,Map,List or set");
+        throw new IllegalArgumentException("type of argument value must be String, Map, List or set");
     }
 
     @Override
     public Object remove(Object key) {
-        Object value = this.get(Objects.requireNonNull(key));
+        Object value = this.get(Objects.requireNonNull(key, "key"));
         client.del(String.valueOf(key));
         return value;
     }
@@ -215,7 +218,7 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
     public Collection<Object> values() {
         Collection<Object> values = new ArrayList<>();
 
-        Set<String> keys = client.keys(".");
+        Set<String> keys = this.keySet();
         for (String key : keys) {
             switch (client.type(key)) {
                 case "none":
@@ -250,16 +253,16 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
                 case "none":
                     continue;
                 case "map":
-                    values.add(new SimpleEntry(key, client.hgetAll(key)));
+                    values.add(new SimpleEntry(this, key, client.hgetAll(key)));
                     continue;
                 case "set":
-                    values.add(new SimpleEntry(key, client.zrange(key, 0, -1)));
+                    values.add(new SimpleEntry(this, key, client.zrange(key, 0, -1)));
                     continue;
                 case "list":
-                    values.add(new SimpleEntry(key, client.lrange(key, 0, -1)));
+                    values.add(new SimpleEntry(this, key, client.lrange(key, 0, -1)));
                     continue;
                 case "string":
-                    values.add(new SimpleEntry(key, client.get(key)));
+                    values.add(new SimpleEntry(this, key, client.get(key)));
                     continue;
                 default:
 
@@ -270,15 +273,82 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
     }
 
     @Override
-    public RedisDatabase getChildDatabase(String key) {
-        throw new UnsupportedOperationException();
+    public ChildDatabase getChildDatabase(String key) {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        if (!client.type(key).equals("map")) {
+            throw new IllegalArgumentException("type of key is not map");
+        }
+        return new ChildDatabase(this, key);
     }
 
-    private static class SimpleEntry implements Entry<String, Object> {
+    // TODO: 2017/7/29  getint, getbyte, getchar, getlist, etc.
+
+    @Override
+    public float getFloat(String key, float defaultValue) {
+        Object value = this.get(key);
+        return value == null ? defaultValue : Float.valueOf(value.toString());
+    }
+
+    @Override
+    public double getDouble(String key, double defaultValue) {
+        Object value = this.get(key);
+        return value == null ? defaultValue : Double.valueOf(value.toString());
+    }
+
+
+    public static final class ChildDatabase extends AbstractDatabase {
+        public static final String NAME = "RedisChild";
+
+        private final RedisDatabase database;
+        private final String parentKey;
+
+        private ChildDatabase(RedisDatabase parentDatabase, String parentKey) {
+            super();
+            database = parentDatabase;
+            this.parentKey = parentKey;
+        }
+
+        @Override
+        public String getName() {
+            return NAME;
+        }
+
+        @Override
+        public String get(Object key) {
+            if (key == null) {
+                throw new NullPointerException("key");
+            }
+            return database.getClient().hget(parentKey, String.valueOf(key));
+        }
+
+        @Override
+        public String put(String key, Object value) {
+            if (key == null) {
+                throw new NullPointerException("key");
+            }
+            if (value == null) {
+                throw new NullPointerException("value");
+            }
+            String old = get(key);
+            database.getClient().hset(parentKey, key, String.valueOf(value));
+            return old;
+        }
+
+        @Override
+        public AbstractDatabase getChildDatabase(String key) {
+            throw new UnsupportedOperationException("redis child database has no child");
+        }
+    }
+
+    private static final class SimpleEntry implements Entry<String, Object> {
+        private final RedisDatabase database;
         private final String key;
         private Object value;
 
-        public SimpleEntry(String key, Object value) {
+        public SimpleEntry(RedisDatabase parentDatabase, String key, Object value) {
+            database = parentDatabase;
             this.key = key;
             this.value = value;
         }
@@ -295,7 +365,7 @@ public class RedisDatabase extends AbstractDatabase implements Database<String, 
 
         @Override
         public final Object setValue(Object value) {
-            return this.value = value;
+            return database.put(key, this.value = value);
         }
 
         @Override

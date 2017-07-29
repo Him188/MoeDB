@@ -2,7 +2,6 @@ package net.mamoe.moedb.defaults;
 
 import cn.nukkit.utils.Config;
 import net.mamoe.moedb.AbstractDatabase;
-import net.mamoe.moedb.Database;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -15,7 +14,7 @@ import java.util.Map;
  * @see LinkedHashMap
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class HashDatabase extends AbstractDatabase implements Database<String, Object>, Cloneable, Serializable {
+public class HashDatabase extends AbstractDatabase implements Cloneable, Serializable {
     public static final String NAME = "Config";
 
     @Override
@@ -27,7 +26,7 @@ public class HashDatabase extends AbstractDatabase implements Database<String, O
         super();
     }
 
-    public HashDatabase(LinkedHashMap<String, ?> map) {
+    public HashDatabase(Map<String, ?> map) {
         super(map);
     }
 
@@ -44,7 +43,11 @@ public class HashDatabase extends AbstractDatabase implements Database<String, O
     @SuppressWarnings("unchecked")
     @Override
     public HashDatabase getChildDatabase(String key) {
-        return new HashDatabase(new LinkedHashMap<>((Map<String, ?>) super.getRawMap(key)));
+        Map<?, ?> map = super.getRawMap(key);
+        if (map == null) {
+            return null;
+        }
+        return new HashDatabase((Map<String, ?>) map);
     }
 
     @Override

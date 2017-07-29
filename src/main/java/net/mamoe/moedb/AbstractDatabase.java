@@ -13,7 +13,9 @@ import java.util.Map;
  * @author Him188 @ MoeDB Project
  */
 @SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue"})
-public abstract class AbstractDatabase extends LinkedHashMap<String, Object> implements Database<String, Object> {
+public abstract class AbstractDatabase extends LinkedHashMap<String, Object> {
+    public abstract String getName();
+
     /**
      * 构造 {@link AbstractDatabase} 实例, 数据库中初始数据为空
      */
@@ -26,7 +28,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
      *
      * @param map 初始数据
      */
-    public AbstractDatabase(Map<? extends String, ? extends Object> map) {
+    public AbstractDatabase(Map<String, ?> map) {
         super(map);
     }
 
@@ -114,13 +116,12 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
         return value == null ? defaultValue : (char) ((Number) value).intValue();
     }
 
-
-    public List<?> getRawList(String key) {
+    public List<?> getList(String key) {
         return (List<?>) super.get(key);
     }
 
     public List<java.lang.String> getStringList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -132,7 +133,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Integer> getIntegerList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -156,7 +157,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Boolean> getBooleanList(String key) {
-        List<?> list = this.getRawList(key);
+        List<?> list = this.getList(key);
         if (list == null) {
             return new ArrayList<>(0);
         }
@@ -183,7 +184,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Double> getDoubleList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -206,7 +207,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Float> getFloatList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -230,7 +231,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Long> getLongList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -254,7 +255,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Byte> getByteList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -278,7 +279,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Character> getCharacterList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -300,7 +301,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
     }
 
     public List<Short> getShortList(String key) {
-        List<?> value = this.getRawList(key);
+        List<?> value = this.getList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
@@ -321,6 +322,11 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> imp
         }
 
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getMap(String key) {
+        return (Map<String, Object>) super.get(key);
     }
 
     public Map<?, ?> getRawMap(String key) {

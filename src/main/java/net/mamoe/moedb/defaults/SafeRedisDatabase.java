@@ -1,6 +1,5 @@
 package net.mamoe.moedb.defaults;
 
-import net.mamoe.moedb.Database;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
@@ -12,7 +11,7 @@ import java.util.*;
  * @author Him188 @ MoeDB Project
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class SafeRedisDatabase extends RedisDatabase implements Database<String, Object> {
+public class SafeRedisDatabase extends RedisDatabase {
     public static String NAME = "SafeRedis";
 
     public SafeRedisDatabase(String host, int port, String user, String password) throws JedisConnectionException {
