@@ -18,7 +18,7 @@ import java.util.Map.Entry;
  * @author Him188 @ MoeDB Project
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class RedisDatabase extends AbstractDatabase<String, Object> implements Database<String, Object> {
+public class RedisDatabase extends AbstractDatabase implements Database<String, Object> {
     public static String NAME = "Redis";
 
     private final Jedis client;

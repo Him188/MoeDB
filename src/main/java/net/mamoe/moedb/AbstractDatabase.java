@@ -2,7 +2,6 @@ package net.mamoe.moedb;
 
 import cn.nukkit.utils.ConfigSection;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.Map;
  * @author Him188 @ MoeDB Project
  */
 @SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue"})
-public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> implements Database<K, V> {
+public abstract class AbstractDatabase extends LinkedHashMap<String, Object> implements Database<String, Object> {
     /**
      * 构造 {@link AbstractDatabase} 实例, 数据库中初始数据为空
      */
@@ -27,7 +26,7 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
      *
      * @param map 初始数据
      */
-    public AbstractDatabase(Map<? extends K, ? extends V> map) {
+    public AbstractDatabase(Map<? extends String, ? extends Object> map) {
         super(map);
     }
 
@@ -40,8 +39,8 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
      * @return <code>key</code> 对应的值, <code>key</code> 不存在时返回 null
      */
     @SuppressWarnings("unchecked")
-    public <T> T getObject(K key) {
-        V value = super.get(key);
+    public <T> T getObject(String key) {
+        Object value = super.get(key);
         return value == null ? null : (T) value;
     }
 
@@ -55,8 +54,8 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
      * @return <code>key</code> 对应的值, <code>key</code> 不存在时返回 null
      */
     @SuppressWarnings("unchecked")
-    public <T> T getObject(K key, Class<T> valueClass) {
-        V value = super.get(key);
+    public <T> T getObject(String key, Class<T> valueClass) {
+        Object value = super.get(key);
         return value == null ? null : (T) value;
     }
 
@@ -70,81 +69,81 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
      * @return <code>key</code> 对应的值不为 <code>null</code> 时返回这个值, 否则返回 <code>defaultValue</code>
      */
     @SuppressWarnings("unchecked")
-    public <T> T getObject(K key, T defaultValue) {
-        V value = super.get(key);
+    public <T> T getObject(String key, T defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : (T) value;
     }
 
-    public String getString(K key, String defaultValue) {
-        V value = super.get(key);
-        return value == null ? defaultValue : String.valueOf(value);
+    public java.lang.String getString(String key, java.lang.String defaultValue) {
+        Object value = super.get(key);
+        return value == null ? defaultValue : java.lang.String.valueOf(value);
     }
 
-    public short getShort(K key, short defaultValue) {
-        V value = super.get(key);
+    public short getShort(String key, short defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : ((Number) value).shortValue();
     }
 
-    public int getInteger(K key, int defaultValue) {
-        V value = super.get(key);
+    public int getInteger(String key, int defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : ((Number) value).intValue();
     }
 
-    public long getLong(K key, long defaultValue) {
-        V value = super.get(key);
+    public long getLong(String key, long defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : ((Number) value).longValue();
     }
 
-    public float getFloat(K key, float defaultValue) {
-        V value = super.get(key);
+    public float getFloat(String key, float defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : ((Number) value).floatValue();
     }
 
-    public double getDouble(K key, double defaultValue) {
-        V value = super.get(key);
+    public double getDouble(String key, double defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : ((Number) value).doubleValue();
     }
 
-    public byte getByte(K key, byte defaultValue) {
-        V value = super.get(key);
+    public byte getByte(String key, byte defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : ((Number) value).byteValue();
     }
 
-    public char getCharacter(K key, char defaultValue) {
-        V value = super.get(key);
+    public char getCharacter(String key, char defaultValue) {
+        Object value = super.get(key);
         return value == null ? defaultValue : (char) ((Number) value).intValue();
     }
 
 
-    public List<?> getRawList(K key) {
+    public List<?> getRawList(String key) {
         return (List<?>) super.get(key);
     }
 
-    public List<String> getStringList(K key) {
+    public List<java.lang.String> getStringList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
-        List<String> result = new ArrayList<>();
-        for (Object o : value) {
-            result.add(o == null ? null : String.valueOf(o));
+        List<java.lang.String> result = new ArrayList<>();
+        for (java.lang.Object o : value) {
+            result.add(o == null ? null : java.lang.String.valueOf(o));
         }
         return result;
     }
 
-    public List<Integer> getIntegerList(K key) {
+    public List<Integer> getIntegerList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Integer> result = new ArrayList<>();
 
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Integer) {
                 result.add((Integer) object);
-            } else if (object instanceof String) {
+            } else if (object instanceof java.lang.String) {
                 try {
-                    result.add(Integer.valueOf((String) object));
+                    result.add(Integer.valueOf((java.lang.String) object));
                 } catch (Exception ignored) {
                 }
             } else if (object instanceof Character) {
@@ -156,19 +155,19 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Boolean> getBooleanList(K key) {
+    public List<Boolean> getBooleanList(String key) {
         List<?> list = this.getRawList(key);
         if (list == null) {
             return new ArrayList<>(0);
         }
         List<Boolean> result = new ArrayList<>();
-        for (Object object : list) {
+        for (java.lang.Object object : list) {
             if (object instanceof Boolean) {
                 result.add((Boolean) object);
-            } else if (object instanceof String) {
-                if (Boolean.TRUE.toString().equalsIgnoreCase((String) object)) {
+            } else if (object instanceof java.lang.String) {
+                if (Boolean.TRUE.toString().equalsIgnoreCase((java.lang.String) object)) {
                     result.add(true);
-                } else if (Boolean.FALSE.toString().equalsIgnoreCase((String) object)) {
+                } else if (Boolean.FALSE.toString().equalsIgnoreCase((java.lang.String) object)) {
                     result.add(false);
                 }
             } else if (object instanceof Number) {
@@ -183,18 +182,18 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Double> getDoubleList(K key) {
+    public List<Double> getDoubleList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Double> result = new ArrayList<>();
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Double) {
                 result.add((Double) object);
-            } else if (object instanceof String) {
+            } else if (object instanceof java.lang.String) {
                 try {
-                    result.add(Double.valueOf((String) object));
+                    result.add(Double.valueOf((java.lang.String) object));
                 } catch (Exception ignored) {
                 }
             } else if (object instanceof Character) {
@@ -206,18 +205,18 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Float> getFloatList(K key) {
+    public List<Float> getFloatList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Float> result = new ArrayList<>();
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Float) {
                 result.add((Float) object);
-            } else if (object instanceof String) {
+            } else if (object instanceof java.lang.String) {
                 try {
-                    result.add(Float.valueOf((String) object));
+                    result.add(Float.valueOf((java.lang.String) object));
                 } catch (Exception ex) {
                     //ignore
                 }
@@ -230,18 +229,18 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Long> getLongList(K key) {
+    public List<Long> getLongList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Long> result = new ArrayList<>();
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Long) {
                 result.add((Long) object);
-            } else if (object instanceof String) {
+            } else if (object instanceof java.lang.String) {
                 try {
-                    result.add(Long.valueOf((String) object));
+                    result.add(Long.valueOf((java.lang.String) object));
                 } catch (Exception ex) {
                     //ignore
                 }
@@ -254,18 +253,18 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Byte> getByteList(K key) {
+    public List<Byte> getByteList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Byte> result = new ArrayList<>();
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Byte) {
                 result.add((Byte) object);
-            } else if (object instanceof String) {
+            } else if (object instanceof java.lang.String) {
                 try {
-                    result.add(Byte.valueOf((String) object));
+                    result.add(Byte.valueOf((java.lang.String) object));
                 } catch (Exception ignored) {
                 }
             } else if (object instanceof Character) {
@@ -278,17 +277,17 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Character> getCharacterList(K key) {
+    public List<Character> getCharacterList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Character> result = new ArrayList<>();
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Character) {
                 result.add((Character) object);
-            } else if (object instanceof String) {
-                String str = (String) object;
+            } else if (object instanceof java.lang.String) {
+                java.lang.String str = (java.lang.String) object;
                 if (str.length() == 1) {
                     result.add(str.charAt(0));
                 }
@@ -300,18 +299,18 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public List<Short> getShortList(K key) {
+    public List<Short> getShortList(String key) {
         List<?> value = this.getRawList(key);
         if (value == null) {
             return new ArrayList<>(0);
         }
         List<Short> result = new ArrayList<>();
-        for (Object object : value) {
+        for (java.lang.Object object : value) {
             if (object instanceof Short) {
                 result.add((Short) object);
-            } else if (object instanceof String) {
+            } else if (object instanceof java.lang.String) {
                 try {
-                    result.add(Short.valueOf((String) object));
+                    result.add(Short.valueOf((java.lang.String) object));
                 } catch (Exception ignored) {
                 }
             } else if (object instanceof Character) {
@@ -324,40 +323,40 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return result;
     }
 
-    public Map<?, ?> getRawMap(K key) {
+    public Map<?, ?> getRawMap(String key) {
         return (Map<?, ?>) super.get(key);
     }
 
 
-    public String getString(K key) {
+    public java.lang.String getString(String key) {
         return getString(key, null);
     }
 
-    public short getShort(K key) {
+    public short getShort(String key) {
         return getShort(key, (short) 0);
     }
 
-    public int getInteger(K key) {
+    public int getInteger(String key) {
         return getInteger(key, 0);
     }
 
-    public long getLong(K key) {
+    public long getLong(String key) {
         return getLong(key, 0L);
     }
 
-    public float getFloat(K key) {
+    public float getFloat(String key) {
         return getFloat(key, 0F);
     }
 
-    public double getDouble(K key) {
+    public double getDouble(String key) {
         return getDouble(key, 0D);
     }
 
-    public byte getByte(K key) {
+    public byte getByte(String key) {
         return getByte(key, (byte) 0);
     }
 
-    public char getCharacter(K key) {
+    public char getCharacter(String key) {
         return getCharacter(key, (char) 0);
     }
 
@@ -368,7 +367,7 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
      *
      * @return 子数据库
      */
-    public AbstractDatabase<K, V> getChildDatabase(K key) {
+    public AbstractDatabase getChildDatabase(String key) {
         throw new UnsupportedOperationException();
     }
 
@@ -383,7 +382,7 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
         return new ConfigSection() {
             {
                 for (Map.Entry<?, ?> entry : AbstractDatabase.this.entrySet()) {
-                    set(String.valueOf(entry.getKey()), entry.getValue());
+                    set(java.lang.String.valueOf(entry.getKey()), entry.getValue());
                 }
             }
         };
@@ -391,7 +390,7 @@ public abstract class AbstractDatabase<K, V> extends LinkedHashMap<K, V> impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    public AbstractDatabase<K, V> clone() {
-        return (AbstractDatabase<K, V>) super.clone();
+    public AbstractDatabase clone() {
+        return (AbstractDatabase) super.clone();
     }
 }

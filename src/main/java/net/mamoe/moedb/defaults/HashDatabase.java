@@ -15,7 +15,7 @@ import java.util.Map;
  * @see LinkedHashMap
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class HashDatabase extends AbstractDatabase<String, Object> implements Database<String, Object>, Cloneable, Serializable {
+public class HashDatabase extends AbstractDatabase implements Database<String, Object>, Cloneable, Serializable {
     public static final String NAME = "Config";
 
     @Override
