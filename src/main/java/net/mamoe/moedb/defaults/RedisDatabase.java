@@ -1,6 +1,6 @@
 package net.mamoe.moedb.defaults;
 
-import cn.nukkit.utils.ConfigSection;
+import net.mamoe.moedb.AbstractDatabase;
 import net.mamoe.moedb.Database;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisShardInfo;
@@ -18,7 +18,7 @@ import java.util.Map.Entry;
  * @author Him188 @ MoeDB Project
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class RedisDatabase extends ConfigSection implements Database<String, Object> {
+public class RedisDatabase extends AbstractDatabase<String, Object> implements Database<String, Object> {
     public static String NAME = "Redis";
 
     private final Jedis client;
@@ -33,6 +33,10 @@ public class RedisDatabase extends ConfigSection implements Database<String, Obj
     public RedisDatabase(JedisShardInfo info) throws JedisConnectionException {
         client = new Jedis(info);
         client.connect();
+    }
+
+    public String select(int id) {
+        return client.select(id);
     }
 
     public Jedis getClient() {
@@ -109,18 +113,24 @@ public class RedisDatabase extends ConfigSection implements Database<String, Obj
     }
 
     @Override
-    public Object get(String key) {
-        switch (client.type(key)) {
+    public Object get(Object key) {
+        if (key == null) {
+            return null;
+        }
+
+        String stringKey = String.valueOf(key);
+
+        switch (client.type(stringKey)) {
             case "none":
                 return null;
             case "map":
-                return client.hgetAll(key);
+                return client.hgetAll(stringKey);
             case "set":
-                return client.zrange(key, 0, -1);
+                return client.zrange(stringKey, 0, -1);
             case "list":
-                return client.lrange(key, 0, -1);
+                return client.lrange(stringKey, 0, -1);
             case "string":
-                return client.get(key);
+                return client.get(stringKey);
             default:
                 return null;
         }
@@ -257,6 +267,11 @@ public class RedisDatabase extends ConfigSection implements Database<String, Obj
         }
 
         return values;
+    }
+
+    @Override
+    public RedisDatabase getChildDatabase(String key) {
+        throw new UnsupportedOperationException();
     }
 
     private static class SimpleEntry implements Entry<String, Object> {
