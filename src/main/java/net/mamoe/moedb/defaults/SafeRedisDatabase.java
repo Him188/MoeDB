@@ -74,4 +74,34 @@ public class SafeRedisDatabase extends RedisDatabase {
             return value;
         }
     }
+
+    @Override
+    public ChildDatabase getChildDatabase(String key) {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        if (!getClient().type(key).equals("map")) {
+            throw new IllegalArgumentException("type of key is not map");
+        }
+        return new ChildDatabase(this, key);
+    }
+
+    public static class ChildDatabase extends RedisDatabase.ChildDatabase{
+        private ChildDatabase(RedisDatabase parentDatabase, String parentKey) {
+            super(parentDatabase, parentKey);
+        }
+
+        @Override
+        public void putAll(Map<? extends String, ?> m) {
+            database.getClient().del(parentKey);
+            database.getClient().hmset(parentKey, new HashMap<String, String>(){
+                {
+                    for (Entry<? extends String, ?> entry : m.entrySet()) {
+                        this.put(entry.getKey(), String.valueOf(entry.getValue()));
+                    }
+                }
+            });
+        }
+    }
+
 }

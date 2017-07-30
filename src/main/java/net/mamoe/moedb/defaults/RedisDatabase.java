@@ -7,6 +7,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 /**
  * Redis 数据库 <br>
@@ -283,7 +284,23 @@ public class RedisDatabase extends AbstractDatabase {
         return new ChildDatabase(this, key);
     }
 
-    // TODO: 2017/7/29  getint, getbyte, getchar, getlist, etc.
+    @Override
+    public short getShort(String key, short defaultValue) {
+        Object value = this.get(key);
+        return value == null ? defaultValue : Short.valueOf(value.toString());
+    }
+
+    @Override
+    public int getInteger(String key, int defaultValue) {
+        Object value = this.get(key);
+        return value == null ? defaultValue : Integer.valueOf(value.toString());
+    }
+
+    @Override
+    public long getLong(String key, long defaultValue) {
+        Object value = this.get(key);
+        return value == null ? defaultValue : Long.valueOf(value.toString());
+    }
 
     @Override
     public float getFloat(String key, float defaultValue) {
@@ -297,14 +314,47 @@ public class RedisDatabase extends AbstractDatabase {
         return value == null ? defaultValue : Double.valueOf(value.toString());
     }
 
+    @Override
+    public byte getByte(String key, byte defaultValue) {
+        Object value = this.get(key);
+        return value == null ? defaultValue : Byte.valueOf(value.toString());
+    }
 
-    public static final class ChildDatabase extends AbstractDatabase {
+    @Override
+    public char getCharacter(String key, char defaultValue) {
+        Object value = this.get(key);
+        return value == null || value.toString().length() == 0 ? defaultValue : value.toString().charAt(0);
+    }
+
+    @Override
+    public List<String> getList(String key) {
+        return client.lrange(key, 0, -1);
+    }
+
+    @Override
+    public Map<String, String> getMap(String key) {
+        return client.hgetAll(key);
+    }
+
+    @Override
+    public Map<String, ?> getRawMap(String key) {
+        return getMap(key);
+    }
+
+    @Override
+    public void forEach(BiConsumer<? super String, ? super Object> action) {
+        for (String s : this.keySet()) {
+            action.accept(s, get(s));
+        }
+    }
+
+    public static class ChildDatabase extends AbstractDatabase {
         public static final String NAME = "RedisChild";
 
-        private final RedisDatabase database;
-        private final String parentKey;
+        protected final RedisDatabase database;
+        protected final String parentKey;
 
-        private ChildDatabase(RedisDatabase parentDatabase, String parentKey) {
+        protected ChildDatabase(RedisDatabase parentDatabase, String parentKey) {
             super();
             database = parentDatabase;
             this.parentKey = parentKey;
@@ -334,6 +384,18 @@ public class RedisDatabase extends AbstractDatabase {
             String old = get(key);
             database.getClient().hset(parentKey, key, String.valueOf(value));
             return old;
+        }
+
+        @Override
+        public void clear() {
+            database.getClient().del(parentKey);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public void putAll(Map<? extends String, ?> m) {
+           database.getClient().del(parentKey);
+           database.getClient().hmset(parentKey, (Map<String, String>) m);
         }
 
         @Override
