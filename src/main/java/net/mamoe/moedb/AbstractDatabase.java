@@ -76,7 +76,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> {
         return value == null ? defaultValue : (T) value;
     }
 
-    public String getString(String key, java.lang.String defaultValue) {
+    public String getString(String key, String defaultValue) {
         Object value = super.get(key);
         return value == null ? defaultValue : java.lang.String.valueOf(value);
     }
@@ -334,7 +334,7 @@ public abstract class AbstractDatabase extends LinkedHashMap<String, Object> {
     }
 
 
-    public java.lang.String getString(String key) {
+    public String getString(String key) {
         return getString(key, null);
     }
 
