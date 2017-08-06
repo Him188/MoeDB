@@ -394,8 +394,13 @@ public class RedisDatabase extends AbstractDatabase {
         @SuppressWarnings("unchecked")
         @Override
         public void putAll(Map<? extends String, ?> m) {
-           database.getClient().del(parentKey);
-           database.getClient().hmset(parentKey, (Map<String, String>) m);
+            database.getClient().del(parentKey);
+            database.getClient().hmset(parentKey, (Map<String, String>) m);
+        }
+
+        @Override
+        public int size() {
+            return (int) (long) database.getClient().hlen(parentKey);
         }
 
         @Override
