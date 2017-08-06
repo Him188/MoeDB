@@ -1,7 +1,6 @@
 .idea/
 target/
 out/
-*.iml
 /lib/commons-pool2-2.4.2.jar
 /lib/jedis-2.9.0.jar
 /lib/jedis-2.9.0-sources.jar

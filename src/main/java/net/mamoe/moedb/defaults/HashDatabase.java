@@ -31,13 +31,7 @@ public class HashDatabase extends AbstractDatabase implements Cloneable, Seriali
     }
 
     public HashDatabase(Config nukkitConfig) {
-        super();
-        putAll(nukkitConfig.getAll());
-    }
-
-    @Override
-    public Object get(Object key) {
-        return super.get(key);
+        this(nukkitConfig.getAll());
     }
 
     @SuppressWarnings("unchecked")
