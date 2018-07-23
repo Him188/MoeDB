@@ -6,7 +6,7 @@
 
     <name>MoeDB</name>
     <groupId>net.mamoe</groupId>
-    <artifactId>MoeDB</artifactId>
+    <artifactId>moedb</artifactId>
     <version>2.0.0</version>
 
     <properties>
@@ -14,6 +14,24 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>him188-nukkit</id>
+            <url>http://repo.him188.moe:8081/repository/nukkit</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>http://repo.him188.moe:8081/repository/moedb/</url>
+        </repository>
+        <snapshotRepository>
+            <id>Snapshots</id>
+            <url>http://repo.him188.moe:8081/repository/moedb/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -26,7 +44,6 @@
             <groupId>cn.nukkit</groupId>
             <artifactId>nukkit</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -35,35 +52,6 @@
     <packaging>jar</packaging>
     <build>
         <defaultGoal>package</defaultGoal>
-
-        <sourceDirectory>src/main/java</sourceDirectory>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-
-                <excludes>
-                    <exclude>plugin.yml</exclude>
-                </excludes>
-            </resource>
-
-            <resource>
-                <directory>src/main/resources</directory>
-
-                <includes>
-                    <include>plugin.yml</include>
-                </includes>
-            </resource>
-
-            <resource>
-                <directory>lib</directory>
-                <targetPath>${project.build.directory}/lib</targetPath>
-            </resource>
-        </resources>
 
         <plugins>
             <plugin>
@@ -78,8 +66,16 @@
                         </goals>
                     </execution>
                 </executions>
+
                 <configuration>
-                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
+                    <artifactSet>
+                        <excludes>
+                            <exclude>cn.nukkit:nukkit</exclude>
+                        </excludes>
+                    </artifactSet>
+
+                    <dependencyReducedPomLocation>
+                        ${project.build.directory}/dependency-reduced-pom.xml
                     </dependencyReducedPomLocation>
                 </configuration>
             </plugin>
