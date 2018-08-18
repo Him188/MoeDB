@@ -13,7 +13,7 @@ If you want to depend this plugin:
     <repositories>
         <repository>
             <id>him188-moedb</id>
-            <url>http://repo.him188.moe:8081/repository/moedb</url>
+            <url>http://repo.him188.moe:8081/repository/moedb/</url>
         </repository>
     ```
 2. Add `dependency` in `build.dependencies`
@@ -21,6 +21,6 @@ If you want to depend this plugin:
     <dependency>
         <groupId>net.mamoe</groupId>
         <artifactId>moedb</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>LATEST</version>
     </dependency>
     ```
