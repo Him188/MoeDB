@@ -18,7 +18,7 @@
     <repositories>
         <repository>
             <id>him188-nukkit</id>
-            <url>http://repo.him188.moe:8081/repository/nukkit</url>
+            <url>http://repo.him188.moe:8081/repository/nukkit/</url>
         </repository>
     </repositories>
 
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
+            <version>LATEST</version>
         </dependency>
 
         <dependency>
@@ -51,6 +51,8 @@
 
     <packaging>jar</packaging>
     <build>
+        <finalName>MoeDB-${project.version}</finalName>
+
         <defaultGoal>package</defaultGoal>
 
         <plugins>
