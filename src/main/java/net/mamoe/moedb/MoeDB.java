@@ -7,4 +7,5 @@ import cn.nukkit.plugin.PluginBase;
  */
 public class MoeDB extends PluginBase {
 
+    
 }
