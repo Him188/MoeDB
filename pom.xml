@@ -7,7 +7,7 @@
     <name>MoeDB</name>
     <groupId>net.mamoe</groupId>
     <artifactId>moedb</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

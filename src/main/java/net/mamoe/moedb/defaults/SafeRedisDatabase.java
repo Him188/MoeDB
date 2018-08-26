@@ -71,7 +71,7 @@ public class SafeRedisDatabase extends RedisDatabase {
                 }
             };
         } else {
-            return value;
+            return String.valueOf(value);
         }
     }
 
