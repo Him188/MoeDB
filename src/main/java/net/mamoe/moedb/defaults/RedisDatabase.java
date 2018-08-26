@@ -212,7 +212,7 @@ public class RedisDatabase extends AbstractDatabase {
 
     @Override
     public Set<String> keySet() {
-        return client.keys(".");
+        return client.keys("*");
     }
 
     @Override
