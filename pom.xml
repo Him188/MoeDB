@@ -17,27 +17,23 @@
 
     <repositories>
         <repository>
-            <id>him188-nukkit</id>
-            <url>http://repo.him188.moe:8081/repository/public/</url>
+            <id>mamoe-repo</id>
+            <url>http://mamoe.net:8081/repository/public/</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>releases</id>
-            <url>http://repo.him188.moe:8081/repository/moedb/</url>
+            <id>mamoe-repo</id>
+            <url>http://mamoe.net:8081/repository/moedb/</url>
         </repository>
-        <snapshotRepository>
-            <id>Snapshots</id>
-            <url>http://repo.him188.moe:8081/repository/moedb/</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <dependencies>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>LATEST</version>
+            <version>3.1.0-m4</version>
             <scope>compile</scope>
         </dependency>
 
@@ -49,7 +45,7 @@
         </dependency>
     </dependencies>
 
-    <url>https://github.com/MamoeTech/MoeDB</url>
+    <url>https://github.com/Him188/MoeDB</url>
 
     <packaging>jar</packaging>
     <build>

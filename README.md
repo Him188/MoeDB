@@ -6,7 +6,7 @@ Other plugins can easily use databases.
 
 
 ## Download [![Build Status](https://travis-ci.org/Him188/MoeDB.svg?branch=master)](https://travis-ci.org/Him188/MoeDB)
-- [Jenkins](http://repo.him188.moe:8080/job/MoeDB)
+- [TeamCity](http://mamoe.net:2333/job/MoeDB)
 
 ## Dependency
 If you want to depend this plugin:
@@ -17,8 +17,8 @@ If you want to depend this plugin:
     ```xml
     <repositories>
         <repository>
-            <id>him188-moedb</id>
-            <url>http://repo.him188.moe:8081/repository/public/</url>
+            <id>mamoe-repo</id>
+            <url>http://mamoe.net:8081/repository/public/</url>
         </repository>
     ```
 2. Add `dependency` in `build.dependencies`
